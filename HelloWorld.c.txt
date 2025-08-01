@@ -1,0 +1,86 @@
+/*
+
+This C++ program:
+
+Reads a text input.
+
+Uses a std::unordered_map to count the frequency of each word.
+
+Builds a reverse lookup unordered_map<int, vector<string>> to get words by their frequency.
+
+Shows how to:
+
+Use custom sorting
+
+Traverse and manipulate hash maps
+
+Handle edge cases (like punctuation)
+
+*/
+
+
+#include <iostream>
+#include <sstream>
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+#include <cctype>
+
+using namespace std;
+
+// Helper to clean a word (remove punctuation, convert to lowercase)
+string cleanWord(const string& word) {
+    string cleaned;
+    for (char ch : word) {
+        if (isalpha(ch)) {
+            cleaned += tolower(ch);
+        }
+    }
+    return cleaned;
+}
+
+int main() {
+    string text = R"(Hash maps are powerful. They offer constant time lookups and inserts. 
+                     Hash maps are widely used in system design and algorithms.)";
+
+    unordered_map<string, int> wordFreq;
+    unordered_map<int, vector<string>> freqWords;
+
+    // Tokenize and clean words
+    istringstream iss(text);
+    string word;
+    while (iss >> word) {
+        string cleaned = cleanWord(word);
+        if (!cleaned.empty()) {
+            wordFreq[cleaned]++;
+        }
+    }
+
+    // Reverse lookup: frequency -> list of words
+    for (const auto& pair : wordFreq) {
+        freqWords[pair.second].push_back(pair.first);
+    }
+
+    // Sort each frequency's word list alphabetically
+    for (auto& pair : freqWords) {
+        sort(pair.second.begin(), pair.second.end());
+    }
+
+    // Print frequencies in descending order
+    vector<int> freqs;
+    for (const auto& pair : freqWords) {
+        freqs.push_back(pair.first);
+    }
+    sort(freqs.rbegin(), freqs.rend());
+
+    cout << "🔍 Word Frequency Analysis:\n\n";
+    for (int freq : freqs) {
+        cout << "Words with frequency " << freq << ":\n";
+        for (const string& w : freqWords[freq]) {
+            cout << "  - " << w << "\n";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
